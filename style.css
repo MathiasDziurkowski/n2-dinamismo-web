@@ -147,5 +147,58 @@ body > div:nth-child(2) {
 #lista-usuarios {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
+}
+
+#ul-postagens h2,
+#ul-usuarios h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1rem;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+#ul-postagens,
+#ul-usuarios {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#ul-postagens li {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+}
+
+#ul-postagens li p {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+#ul-usuarios li {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#ul-usuarios li p:firt-child {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+#ul-usuarios li p {
+  font-size: 13px;
+  color: var(--muted);
 }
