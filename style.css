@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+ 
+:root {
+  --bg:        #f5f4f0;
+  --surface:   #ffffff;
+  --border:    #1a1a1a;
+  --divider:   #1a1a1a;
+  --text:      #1a1a1a;
+  --muted:     #6b6b6b;
+  --accent:    #1a1a1a;
+  --danger:    #c0392b;
+  --danger-bg: #fdf0ee;
+  --edit-bg:   #f0f4ff;
+  --edit-col:  #2c4baa;
+  --radius:    4px;
+  --font:      'DM Sans', sans-serif;
+  --mono:      'DM Mono', monospace;
+}
+ 
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+body > div:first-child {
+  display: grid;
+  grid-template-columns: 1fr 4px 1fr 4px 1fr;
+  min-height: 220px;
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+}
+
+body > div:first-child > div:nth-child(2),
+body > div:first-child > div:nth-child(4) {
+  background: var(--divider);
+  width: 2px;
+}
+
+#adicionar,
+#editar,
+#remover {
+  padding: 2rem 2rem 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+#btn-adicionar,
+#btn-editar,
+#remover > button {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  align-self: flex-start;
+  transition: background 0.15s, color 0.15s;
+}
+ 
+#btn-adicionar:hover { background: var(--text); color: var(--surface); }
+ 
+#btn-editar { background: var(--edit-bg); color: var(--edit-col); border-color: var(--edit-col); }
+#btn-editar:hover { background: var(--edit-col); color: #fff; }
+ 
+#remover > button { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+#remover > button:hover { background: var(--danger); color: #fff; }
+
+#adicionar-postagem,
+#adicionar-usuario,
+#editar-postagem,
+#editar-usuario {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+input[type="text"] {
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1.5px solid #ccc;
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  width: 100%;
+  transition: border-color 0.15s;
+  outline: none;
+}
+ 
+input[type="text"]::placeholder { color: #aaa; }
+input[type="text"]:focus { border-color: var(--border); }
+ 
+
+#remover input[type="text"] {
+  width: 120px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+body > div:nth-child(2) {
+  max-width: 780px;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+ 
+#opt {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 7px 36px 7px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231a1a1a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  align-self: flex-end;
+  outline: none;
+  transition: box-shadow 0.15s;
+}
+ 
+#opt:focus { box-shadow: 0 0 0 3px rgba(26,26,26,0.12); }
+ 
+#lista-postagens,
+#lista-usuarios {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+#ul-postagens h2,
+#ul-usuarios h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1rem;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+#ul-postagens,
+#ul-usuarios {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#ul-postagens li {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+}
+
+#ul-postagens li p {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+#ul-usuarios li {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#ul-usuarios li p:firt-child {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+#ul-usuarios li p {
+  font-size: 13px;
+  color: var(--muted);
+}
