@@ -78,3 +78,35 @@ body > div:first-child > div:nth-child(4) {
  
 #remover > button { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
 #remover > button:hover { background: var(--danger); color: #fff; }
+
+#adicionar-postagem,
+#adicionar-usuario,
+#editar-postagem,
+#editar-usuario {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+input[type="text"] {
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1.5px solid #ccc;
+  border-radius: var(--radius);
+  padding: 7px 12px;
+  width: 100%;
+  transition: border-color 0.15s;
+  outline: none;
+}
+ 
+input[type="text"]::placeholder { color: #aaa; }
+input[type="text"]:focus { border-color: var(--border); }
+ 
+/* campo de índice em remover */
+#remover input[type="text"] {
+  width: 120px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
