@@ -23,12 +23,16 @@ let allDivs = [postList, userList, addUser, addPost, editUser, editPost];
 let allButtons = [add, edit, remove];
 let usersDiv = [userList, addUser, editUser];
 let postsDiv = [postList, addPost, editPost];
+let usersLength = 0;
 
 document.body.onload = async () => {
     initialVisibility();
     users = await fetchData(endpointUser);
-    posts = await fetchData(endpointPosts);  
+    usersLength = users.length;
+    posts = await fetchData(endpointPosts); 
 }
+
+
 
 editButton.addEventListener('click', () => {
     const select = document.getElementById("select-options");
@@ -69,9 +73,14 @@ editButton.addEventListener('click', () => {
 removeButton.addEventListener('click', () => {  
     const select = document.getElementById("remove-options");
     const id = select.value;
+    if (users.length > usersLength) usersLength = users.length;
     if (lastOption === 'user') {
         const user = users.find(user => user.id == id);
         users.splice(users.indexOf(user), 1);
+        postsToRemove = posts.filter(post => post.userId == id);
+        postsToRemove.forEach(post => {
+            posts.splice(posts.indexOf(post), 1);
+        });
         fetchAndDisplayUsers();
     }
     else if (lastOption === 'post') {
@@ -79,19 +88,36 @@ removeButton.addEventListener('click', () => {
         posts.splice(posts.indexOf(post), 1);
         fetchAndDisplayPosts();
     }
+    usersLength++;
     optionsSelectorFunction(lastOption);
 })
 
 addButton.addEventListener('click', () => {
     if (lastOption === 'user') {
-        const newUser = {
-            id: users.length + 1,
+        if (!document.getElementById("name").value || !document.getElementById("email").value) {
+            alert("Por favor, preencha todos os campos para adicionar um usuário.");
+            return;
+        }
+        let newUser = {
+            id: usersLength + 1,
             name: document.getElementById("name").value,
             email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value || '',
+            username: document.getElementById("username").value || '',
+            address: {
+                street: document.getElementById("street").value || '',
+                city: document.getElementById("city").value || '',
+                zipcode: document.getElementById("zipcode").value || ''
+            }
         }
         users.push(newUser);
+        console.log(users);
         fetchAndDisplayUsers();
     } else if (lastOption === 'post') {
+        if (!document.getElementById("title").value || !document.getElementById("body").value || !document.getElementById("userId").value) {
+            alert("Por favor, preencha todos os campos para adicionar uma postagem.");
+            return;
+        }
         const newPost = {
             id: posts.length + 1,
             title: document.getElementById("title").value,
@@ -149,6 +175,12 @@ const editAutoComplete = (id) => {
                 Object.keys(user).forEach(key => {
                     if (child.id === `edit-${key}` && id == user.id) {
                         child.value = user[key];
+                        console.log(child.value);
+                    }
+                })
+                Object.keys(user.address).forEach(key => {
+                    if (child.id === `edit-${key}` && id == user.id) {
+                        child.value = user.address[key];
                         console.log(child.value);
                     }
                 })
@@ -226,16 +258,20 @@ const fetchAndDisplayUsers = () => {
         const userName = document.createElement('p');
         userName.textContent = `Nome: ${user.name}`;
         const userEmail = document.createElement('p');
+        const userAddress = document.createElement('p');
         const postsParagraph = document.createElement('p');
-        let userPosts = posts.filter(post => post.userId === user.id);
+        const userPosts = posts.filter(post => post.userId === user.id);
         postCount = userPosts.length;
         userEmail.textContent = `Email: ${user.email}`;
+        userAddress.textContent = `Endereço: ${user.address.street}, ${user.address.city}, ${user.address.zipcode}`; 
         postsParagraph.textContent = `Número de postagens: ${postCount}`;
         userItem.appendChild(userName);
         userItem.appendChild(userEmail);
+        userItem.appendChild(userAddress);
         userItem.appendChild(postsParagraph);
         ulUsers.appendChild(userItem);
     });
+    editAutoComplete(lastOption === 'user' ? users[0].id : posts[0].id);
 }
 
 const fetchAndDisplayPosts = () => {
@@ -261,7 +297,17 @@ const fetchAndDisplayPosts = () => {
         const option = document.createElement('option');
         option.value = user.id;
         option.textContent = user.name;
+        if (usersSelector.children.length < users.length) {
         usersSelector.appendChild(option);
+        } else {
+            usersSelector.innerHTML = '';
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.name;
+                usersSelector.appendChild(option);
+            });
+        }
      });
 }
 
