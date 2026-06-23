@@ -28,6 +28,7 @@ const notificationTitle = document.getElementById("notificação-titulo");
 const notificationBody = document.getElementById("notificação-corpo");
 const loading = document.getElementById("loading");
 const body = document.body;
+const searchInput = document.getElementById("search");
 let posts = [];
 let users = [];
 
@@ -98,7 +99,21 @@ const editItem = () => {
     const elementsEditPost = document.getElementById("editar-postagem").children;
     if (users.length > usersLength) usersLength = users.length;
     if (posts.length > postsLength) postsLength = posts.length;
+
     if (lastOption === 'user') {
+        let hasName = false;
+        let hasEmail = false;
+
+        for (let element of elementsEdit) {
+            if (element.id === "edit-name") hasName = element.value.trim().length > 0;
+            if (element.id === "edit-email") hasEmail = element.value.trim().length > 0;
+        }
+
+        if (!hasName || !hasEmail) {
+            showNotification("Erro ao editar usuário", "Por favor, preencha os campos obrigatórios.");
+            return;
+        }
+
         for (let element of elementsEdit) {
             const user = users.find(user => user.id == id);
             Object.keys(user).forEach(key => {
@@ -113,6 +128,19 @@ const editItem = () => {
         showNotification("Usuário editado", `O usuário ${users.find(user => user.id == id).name} foi editado com sucesso.`);
         fetchAndDisplayUsers(); 
     } else if (lastOption === 'post') {
+        let hasTitle = false;
+        let hasBody = false;
+
+        for (let element of elementsEditPost) {
+            if (element.id === "edit-title") hasTitle = element.value.trim().length > 0;
+            if (element.id === "edit-body") hasBody = element.value.trim().length > 0;
+        }
+
+        if (!hasTitle || !hasBody) {
+            showNotification("Erro ao editar postagem", "Por favor, preencha os campos obrigatórios.");
+            return;
+        }
+
         for (let element of elementsEditPost) {
             const post = posts.find(post => post.id == id);
             Object.keys(post).forEach(key => {
@@ -135,6 +163,7 @@ const showNotification = (title, body) => {
     notificationTitle.textContent = title;
     notificationBody.textContent = body;
     notification.style.display = 'block';
+    notification.style.borderColor = title.includes("Erro") ? 'var(--danger)' : 'var(--success)';
     notification.style.animation = 'fadeIn 0.5s, fadeOut 0.5s 2.5s';
     setTimeout(() => {
         notification.style.display = 'none';
@@ -235,6 +264,11 @@ const addItem = () => {
 }
 
 addButton.addEventListener('click', () => {
+    if (lastOption === 'user') {
+        dialogAdd.querySelector('h1').textContent = `Tem certeza que deseja adicionar este usuário?`;
+    } else if (lastOption === 'post') {
+        dialogAdd.querySelector('h1').textContent = `Tem certeza que deseja adicionar esta postagem?`;
+    }
     dialogAdd.showModal();
 
     dialogAddConfirmButton.onclick = () => {
@@ -429,6 +463,51 @@ optionsSelector.addEventListener('change', (event) => {
     visibleList(event.target.value);
     optionsSelectorFunction(event.target.value);
     lastOption = event.target.value;
+})
+
+searchInput.addEventListener('input', (event) => {
+    const searchTerm = event.target.value.toLowerCase();
+    if (lastOption === 'user') {
+        const filteredUsers = users.filter(user => user.name.toLowerCase().includes(searchTerm));
+        userList.innerHTML = '<ul id="ul-usuarios"><h2>Usuários</h2></ul>';
+        const ulUsers = document.getElementById("ul-usuarios");
+        filteredUsers.forEach(user => {
+            const userItem = document.createElement('li');
+            userItem.id = "user-list-item";
+            const userName = document.createElement('p');
+            userName.textContent = `Nome: ${user.name}`;
+            const userEmail = document.createElement('p');
+            const userAddress = document.createElement('p');
+            const postsParagraph = document.createElement('p');
+            const userPosts = posts.filter(post => post.userId === user.id);
+            const postCount = userPosts.length;
+            userEmail.textContent = `Email: ${user.email}`;
+            userAddress.textContent = `Endereço: ${user.address.street}, ${user.address.city}, ${user.address.zipcode}`; 
+            postsParagraph.textContent = `Número de postagens: ${postCount}`;
+            userItem.appendChild(userName);
+            userItem.appendChild(userEmail);
+            userItem.appendChild(userAddress);
+            userItem.appendChild(postsParagraph);
+            ulUsers.appendChild(userItem);
+        });
+    } else if (lastOption === 'post') {
+        const filteredPosts = posts.filter(post => post.title.toLowerCase().includes(searchTerm) || post.body.toLowerCase().includes(searchTerm));
+        postList.innerHTML = '<ul id="ul-postagens"><h2>Postagens</h2></ul>';
+        const ulPosts = document.getElementById("ul-postagens");
+        filteredPosts.forEach(post => {
+            const postItem = document.createElement('li');
+            const title = document.createElement('h3');
+            title.textContent = `${post.title}`;
+            postItem.textContent = `${post.body}`;
+            ulPosts.appendChild(postItem);
+            postItem.prepend(title)
+            const userName = document.createElement('p');
+            const user = users.find(user => user.id === post.userId);
+            userName.textContent = `Autor: ${user ? user.name : 'Desconhecido'}`;
+            postItem.appendChild(userName);
+        }); 
+    }
+
 })
 
 document.addEventListener('change', (event) => {
