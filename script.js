@@ -43,9 +43,14 @@ document.body.onload = async () => {
     body.classList.add('is-loading');
     loading.style.display = 'flex';
 
-    users = await fetchData(endpointUser);
+    const [usersResult, postsResult] = await Promise.allSettled([
+        fetchData(endpointUser),
+        fetchData(endpointPosts)
+    ]);
+
+    users = usersResult.status === 'fulfilled' ? usersResult.value : [];
+    posts = postsResult.status === 'fulfilled' ? postsResult.value : [];
     usersLength = users.length;
-    posts = await fetchData(endpointPosts);
     postsLength = posts.length;
     lastOption = 'post';
     optionsSelector.value = 'post';
@@ -53,8 +58,16 @@ document.body.onload = async () => {
     initialVisibility();
     visibleList("post");
     optionsSelectorFunction("post");
+
     body.classList.remove('is-loading');
     loading.style.display = 'none';
+
+    if (usersResult.status === 'rejected' || postsResult.status === 'rejected') {
+        showNotification(
+            "Erro ao buscar dados",
+            "Não foi possível carregar todos os dados da API. Verifique sua conexão e tente novamente."
+        );
+    }
 }
 
 
@@ -311,10 +324,14 @@ const editAutoComplete = (id) => {
 const fetchData = async (endpoint) => {
     try {
         const response = await fetch(endpoint);
+        if (!response.ok) {
+            throw new Error(`Falha ao buscar ${endpoint}: ${response.status}`);
+        }
         const data = await response.json();
         return data;
     } catch (error) {
         console.error('Error fetching data:', error);
+        throw error;
     }
 }
 
