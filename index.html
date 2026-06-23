@@ -61,12 +61,39 @@
     </div>
     <div>
     <select name="opção" id="opt">
-        <option value="post">postagem</option>
+        <option value="post" selected>postagem</option>
         <option value="user">usuarios</option>
     </select>    
     <div id="lista-postagens"></div>
     <div id="lista-usuarios"></div>
     </div>
+
+    <div id="loading">Carregando...</div>
+
+    <div id="notificação">
+      <h1 id="notificação-titulo"></h1>
+      <p id="notificação-corpo"></p>
+    </div>
+
+
+    <dialog id="dialogRemover">
+        <h1></h1>
+        <button id="btn-remover-cancelar">Cancelar</button>
+        <button id="btn-remover-confirmar">Confirmar</button>
+    </dialog>
+
+    <dialog id="dialogEditar">
+        <h1></h1>
+        <button id="btn-editar-cancelar">Cancelar</button>
+        <button id="btn-editar-confirmar">Confirmar</button>
+    </dialog>
+
+    <dialog id="dialogAdicionar">
+        <h1></h1>
+        <button id="btn-adicionar-cancelar">Cancelar</button>
+        <button id="btn-adicionar-confirmar">Confirmar</button>
+    </dialog>
+
     <script src="script.js"></script>
   </body>
 </html>

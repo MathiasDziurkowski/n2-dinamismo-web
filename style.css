@@ -30,6 +30,27 @@ body {
   min-height: 100vh;
 }
 
+body.is-loading > div:not(#loading),
+body.is-loading > dialog,
+body.is-loading > #notificação {
+  display: none;
+}
+
+#loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 244, 240, 0.96);
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  z-index: 2000;
+}
+
 body > div:first-child {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -212,4 +233,50 @@ body > div:nth-child(2) {
 #ul-usuarios li p {
   font-size: 13px;
   color: var(--muted);
+}
+
+#dialogRemover,
+#dialogEditar,
+#dialogAdicionar {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 2rem;
+}
+
+#notificação {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.5rem;
+  display: none;
+  z-index: 1000;
+}
+
+#notificação h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+#notificação p {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }

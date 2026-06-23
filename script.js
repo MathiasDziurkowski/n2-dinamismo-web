@@ -14,31 +14,77 @@ const addButton = document.getElementById("btn-adicionar");
 const editButton = document.getElementById("btn-editar");
 const editPost = document.getElementById("editar-postagem");
 const removeButton = document.getElementById("btn-remover");
+const dialogRemove = document.getElementById("dialogRemover");
+const dialogRemoveConfirmButton = document.getElementById("btn-remover-confirmar");
+const dialogRemoveCancelButton = document.getElementById("btn-remover-cancelar")
+const dialogEdit = document.getElementById("dialogEditar");
+const dialogEditConfirmButton = document.getElementById("btn-editar-confirmar");
+const dialogEditCancelButton = document.getElementById("btn-editar-cancelar");
+const dialogAdd = document.getElementById("dialogAdicionar");
+const dialogAddConfirmButton = document.getElementById("btn-adicionar-confirmar");
+const dialogAddCancelButton = document.getElementById("btn-adicionar-cancelar");
+const notification = document.getElementById("notificação");
+const notificationTitle = document.getElementById("notificação-titulo");
+const notificationBody = document.getElementById("notificação-corpo");
+const loading = document.getElementById("loading");
 const body = document.body;
 let posts = [];
 let users = [];
-let lastOption = '';
+
 
 let allDivs = [postList, userList, addUser, addPost, editUser, editPost];
 let allButtons = [add, edit, remove];
 let usersDiv = [userList, addUser, editUser];
 let postsDiv = [postList, addPost, editPost];
-let usersLength = 0;
+let usersLength = 1;
+let postsLength = 1;
 
 document.body.onload = async () => {
-    initialVisibility();
+    body.classList.add('is-loading');
+    loading.style.display = 'flex';
+
     users = await fetchData(endpointUser);
     usersLength = users.length;
-    posts = await fetchData(endpointPosts); 
+    posts = await fetchData(endpointPosts);
+    postsLength = posts.length;
+    lastOption = 'post';
+    optionsSelector.value = 'post';
+
+    initialVisibility();
+    visibleList("post");
+    optionsSelectorFunction("post");
+    body.classList.remove('is-loading');
+    loading.style.display = 'none';
 }
 
 
 
+
 editButton.addEventListener('click', () => {
+    if (lastOption === 'user') {
+        dialogEdit.querySelector('h1').textContent = `Tem certeza que deseja editar este usuário?`;
+    } else if (lastOption === 'post') {
+        dialogEdit.querySelector('h1').textContent = `Tem certeza que deseja editar esta postagem?`;
+    }
+    dialogEdit.showModal();
+
+    dialogEditConfirmButton.onclick = () => {
+        editItem();
+        dialogEdit.close();
+    };
+    dialogEditCancelButton.onclick = () => {
+        dialogEdit.close();
+    };
+})
+
+const editItem = () => {
     const select = document.getElementById("select-options");
     const id = select.value;
+    const lastPostsLength = posts.length;
     const elementsEdit = document.getElementById("editar-usuario").children;
     const elementsEditPost = document.getElementById("editar-postagem").children;
+    if (users.length > usersLength) usersLength = users.length;
+    if (posts.length > postsLength) postsLength = posts.length;
     if (lastOption === 'user') {
         for (let element of elementsEdit) {
             const user = users.find(user => user.id == id);
@@ -51,6 +97,7 @@ editButton.addEventListener('click', () => {
                 }
             })
         }  
+        showNotification("Usuário editado", `O usuário ${users.find(user => user.id == id).name} foi editado com sucesso.`);
         fetchAndDisplayUsers(); 
     } else if (lastOption === 'post') {
         for (let element of elementsEditPost) {
@@ -65,38 +112,80 @@ editButton.addEventListener('click', () => {
                 }
             })
         }
+        showNotification("Postagem editada", `A postagem "${posts.find(post => post.id == id).title}" foi editada com sucesso.`);
         fetchAndDisplayPosts();
     }
     optionsSelectorFunction(lastOption);
+}
+
+const showNotification = (title, body) => {
+    notificationTitle.textContent = title;
+    notificationBody.textContent = body;
+    notification.style.display = 'block';
+    notification.style.animation = 'fadeIn 0.5s, fadeOut 0.5s 2.5s';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+
+
+removeButton.addEventListener('click', () => {
+    const select = document.getElementById("remove-options");
+    if (lastOption === 'user') {
+        dialogRemove.querySelector('h1').textContent = `Tem certeza que deseja remover ${users.find(user => user.id == select.value)?.name}? Ele(a) e todas as suas postagens serão removidos.`;
+    } else if (lastOption === 'post') {
+        dialogRemove.querySelector('h1').textContent = `Tem certeza que deseja remover esta postagem?`;
+    }
+    dialogRemove.showModal();
+
+    dialogRemoveConfirmButton.onclick = () => {
+        removeItem();
+        dialogRemove.close();
+    };
+    dialogRemoveCancelButton.onclick = () => {
+        dialogRemove.close();
+    };
 })
 
-removeButton.addEventListener('click', () => {  
+const removeItem = () => {
     const select = document.getElementById("remove-options");
     const id = select.value;
     if (users.length > usersLength) usersLength = users.length;
     if (lastOption === 'user') {
         const user = users.find(user => user.id == id);
+        console.log(user);
         users.splice(users.indexOf(user), 1);
         postsToRemove = posts.filter(post => post.userId == id);
         postsToRemove.forEach(post => {
             posts.splice(posts.indexOf(post), 1);
+            postsLength++;
         });
+        showNotification("Usuário removido", `O usuário ${user.name} e suas postagens foram removidos com sucesso.`);
         fetchAndDisplayUsers();
     }
     else if (lastOption === 'post') {
         const post = posts.find(post => post.id == id);
         posts.splice(posts.indexOf(post), 1);
+        showNotification("Postagem removida", `A postagem "${post.title}" foi removida com sucesso.`);
         fetchAndDisplayPosts();
     }
     usersLength++;
+    postsLength++;
     optionsSelectorFunction(lastOption);
-})
+}
 
-addButton.addEventListener('click', () => {
+const addItem = () => {
     if (lastOption === 'user') {
         if (!document.getElementById("name").value || !document.getElementById("email").value) {
-            alert("Por favor, preencha todos os campos para adicionar um usuário.");
+            showNotification("Erro ao adicionar usuário", "Por favor, preencha os campos obrigatórios");
             return;
+        }
+        if (users.length > usersLength) {
+            usersLength = users.length;
+        }
+        if (posts.length > postsLength) {
+            postsLength = posts.length;
         }
         let newUser = {
             id: usersLength + 1,
@@ -112,22 +201,38 @@ addButton.addEventListener('click', () => {
         }
         users.push(newUser);
         console.log(users);
+        showNotification("Usuário adicionado", `O usuário ${newUser.name} foi adicionado com sucesso.`);
         fetchAndDisplayUsers();
     } else if (lastOption === 'post') {
         if (!document.getElementById("title").value || !document.getElementById("body").value || !document.getElementById("userId").value) {
-            alert("Por favor, preencha todos os campos para adicionar uma postagem.");
+            showNotification("Erro ao adicionar postagem", "Por favor, preencha todos os campos para adicionar uma postagem.");
             return;
         }
         const newPost = {
-            id: posts.length + 1,
+            id: postsLength + 1,
             title: document.getElementById("title").value,
             body: document.getElementById("body").value,
             userId: parseInt(document.getElementById("userId").value)
         }
         posts.push(newPost);
+        showNotification("Postagem adicionada", `A postagem "${newPost.title}" foi adicionada com sucesso.`);
         fetchAndDisplayPosts();
     }
     optionsSelectorFunction(lastOption);
+}
+
+addButton.addEventListener('click', () => {
+    dialogAdd.showModal();
+
+    dialogAddConfirmButton.onclick = () => {
+        addItem();
+        dialogAdd.close();
+    };
+    dialogAddCancelButton.onclick = () => {
+        dialogAdd.close();
+    };
+    
+
 })
 
 const optionsSelectorFunction = (opt) => {
@@ -279,6 +384,7 @@ const fetchAndDisplayPosts = () => {
     const ulPosts = document.getElementById("ul-postagens");
     
     const usersSelector = document.getElementById("userId");
+    usersSelector.innerHTML = '';
 
     posts.forEach(post => {
         const postItem = document.createElement('li');
@@ -297,19 +403,10 @@ const fetchAndDisplayPosts = () => {
         const option = document.createElement('option');
         option.value = user.id;
         option.textContent = user.name;
-        if (usersSelector.children.length < users.length) {
         usersSelector.appendChild(option);
-        } else {
-            usersSelector.innerHTML = '';
-            users.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user.id;
-                option.textContent = user.name;
-                usersSelector.appendChild(option);
-            });
-        }
-     });
+    });
 }
+
 
 optionsSelector.addEventListener('change', (event) => {
     visibleList(event.target.value);
